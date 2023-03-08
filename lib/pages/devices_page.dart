@@ -5,10 +5,24 @@ class DevicesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.blue,
-      alignment: Alignment.center,
-      child: const Text('Test'),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Devices"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh Devices',
+            onPressed: () {},
+          )
+        ],
+      ),
+      body: ListView(
+        children: const [
+          Card(child: ListTile(title: Text("Device 1"))),
+          Card(child: ListTile(title: Text("Device 2"))),
+          Card(child: ListTile(title: Text("Device 3"))),
+        ],
+      ),
     );
   }
 }

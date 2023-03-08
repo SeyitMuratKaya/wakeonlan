@@ -9,7 +9,11 @@ class ExampleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: NavigationExample());
+    return MaterialApp(
+      home: const NavigationExample(),
+      theme: ThemeData(
+          useMaterial3: true, colorSchemeSeed: const Color(0x00F2F2F2)),
+    );
   }
 }
 
