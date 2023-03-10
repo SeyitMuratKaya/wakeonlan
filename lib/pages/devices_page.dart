@@ -34,26 +34,6 @@ class _DevicesPageState extends State<DevicesPage> {
             tooltip: 'Refresh Devices',
             onPressed: () {},
           ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: 'Add Devices',
-            onPressed: () async {
-              //save to local storage
-              final result = await openDialog(
-                  context, nameController, ipController, macController);
-              if (result == null || result.isEmpty) return;
-              setState(() {
-                myComputers.insert(
-                myComputers.length,
-                DeviceItem(
-                  name: result[0],
-                  ipAdd: result[1],
-                  macAdd: result[2],
-                ),
-              );
-              });
-            },
-          ),
         ],
       ),
       body: ListView.builder(
@@ -61,6 +41,26 @@ class _DevicesPageState extends State<DevicesPage> {
         itemBuilder: (context, index) {
           return myComputers[index];
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          //save to local storage
+          final result = await openDialog(
+              context, nameController, ipController, macController);
+          if (result == null || result.isEmpty) return;
+          setState(() {
+            myComputers.insert(
+              myComputers.length,
+              DeviceItem(
+                name: result[0],
+                ipAdd: result[1],
+                macAdd: result[2],
+              ),
+            );
+          });
+        },
+        tooltip: "Add Device",
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -2,29 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:wakeonlan/pages/devices_page.dart';
 import 'package:wakeonlan/pages/network_page.dart';
 
-void main() => runApp(const ExampleApp());
+void main() => runApp(
+      MaterialApp(
+        home: const ExampleApp(),
+        theme: ThemeData(
+          useMaterial3: true,
+          colorSchemeSeed: const Color(0x00F2F2F2),
+        ),
+      ),
+    );
 
-class ExampleApp extends StatelessWidget {
+class ExampleApp extends StatefulWidget {
   const ExampleApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const NavigationExample(),
-      theme: ThemeData(
-          useMaterial3: true, colorSchemeSeed: const Color(0x00F2F2F2)),
-    );
-  }
+  State<ExampleApp> createState() => _ExampleAppState();
 }
 
-class NavigationExample extends StatefulWidget {
-  const NavigationExample({super.key});
-
-  @override
-  State<NavigationExample> createState() => _NavigationExampleState();
-}
-
-class _NavigationExampleState extends State<NavigationExample> {
+class _ExampleAppState extends State<ExampleApp> {
   int currentPageIndex = 0;
 
   @override
