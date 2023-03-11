@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:wakeonlan/file_manager.dart';
+import 'device_item.dart';
 import 'open_dialog.dart';
 
 final List<NetworkItem> lanComputers = <NetworkItem>[
@@ -35,6 +39,31 @@ class _NetworkItemState extends State<NetworkItem> {
   final ipController = TextEditingController();
   final macController = TextEditingController();
 
+  FileManager fileManager = FileManager();
+
+  void _addDevice(List<String> result) {
+    fileManager.readCounter().then((value) {
+      Device newDevice = Device(name: result[0], ip: result[1], mac: result[2]);
+      List<dynamic> allDevices = jsonDecode(value);
+
+      allDevices.add(newDevice);
+
+      String allDevicesJson = jsonEncode(allDevices);
+
+      fileManager.writeCounter(allDevicesJson);
+
+      setState(() {
+        myComputers.clear();
+        for (var element in allDevices) {
+          myComputers.add(DeviceItem(
+              name: element["name"],
+              ipAdd: element["ip"],
+              macAdd: element["mac"]));
+        }
+      });
+    });
+  }
+
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -56,6 +85,7 @@ class _NetworkItemState extends State<NetworkItem> {
               context, nameController, ipController, macController);
           if (result == null || result.isEmpty) return;
           // Save to local storage
+          // TODO: crash _addDevice(result);
         },
         title: Text(widget.name),
         subtitle: Text("${widget.ipAdd} - ${widget.macAdd}"),

@@ -1,17 +1,6 @@
 import 'package:flutter/material.dart';
 
-final List<DeviceItem> myComputers = <DeviceItem>[
-  const DeviceItem(
-    name: "My Computer 1",
-    ipAdd: "192.168.1.5",
-    macAdd: "38:f9:d3:a4:96:ab",
-  ),
-  const DeviceItem(
-    name: "My Computer 2",
-    ipAdd: "192.168.1.7",
-    macAdd: "0e:22:88:d6:97:e0",
-  ),
-];
+final List<DeviceItem> myComputers = <DeviceItem>[];
 
 class DeviceItem extends StatefulWidget {
   const DeviceItem({

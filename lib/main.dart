@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wakeonlan/file_manager.dart';
 import 'package:wakeonlan/pages/devices_page.dart';
 import 'package:wakeonlan/pages/network_page.dart';
 
@@ -44,7 +45,7 @@ class _ExampleAppState extends State<ExampleApp> {
         ],
       ),
       body: <Widget>[
-        const DevicesPage(),
+        DevicesPage(storage: FileManager()),
         const NetworkPage(),
       ][currentPageIndex],
     );

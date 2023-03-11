@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:wakeonlan/file_manager.dart';
+import 'dart:convert';
 import '../device_item.dart';
 import '../open_dialog.dart';
 
 class DevicesPage extends StatefulWidget {
-  const DevicesPage({super.key});
+  const DevicesPage({super.key, required this.storage});
+
+  final FileManager storage;
 
   @override
   State<DevicesPage> createState() => _DevicesPageState();
@@ -24,15 +28,75 @@ class _DevicesPageState extends State<DevicesPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    widget.storage.readCounter().then((value) {
+      setState(() {
+        _devices = value;
+        List<dynamic> allDevices = jsonDecode(_devices);
+        setState(() {
+        myComputers.clear();
+        for (var element in allDevices) {
+          myComputers.add(DeviceItem(
+              name: element["name"],
+              ipAdd: element["ip"],
+              macAdd: element["mac"]));
+        }
+      });
+        debugPrint("All devices $_devices");
+      });
+    });
+  }
+
+  String _devices = "";
+
+  void _deleteDevices() {
+    setState(() {
+      if (myComputers.isNotEmpty) myComputers.removeLast();
+    });
+    widget.storage.writeCounter("[]");
+    _devices = "[]";
+  }
+
+  void _addDevice(List<String> result) {
+    Device newDevice = Device(name: result[0], ip: result[1], mac: result[2]);
+
+    List<dynamic> allDevices = jsonDecode(_devices);
+
+    allDevices.add(newDevice);
+
+    String allDevicesJson = jsonEncode(allDevices);
+
+    widget.storage.writeCounter(allDevicesJson);
+
+    widget.storage.readCounter().then((value) {
+      List<dynamic> devices = jsonDecode(value);
+      setState(() {
+        myComputers.clear();
+        for (var element in devices) {
+          myComputers.add(DeviceItem(
+              name: element["name"],
+              ipAdd: element["ip"],
+              macAdd: element["mac"]));
+        }
+      });
+    });
+
+    _devices = allDevicesJson;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Devices"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(Icons.delete),
             tooltip: 'Refresh Devices',
-            onPressed: () {},
+            onPressed: () {
+              _deleteDevices();
+            },
           ),
         ],
       ),
@@ -48,16 +112,7 @@ class _DevicesPageState extends State<DevicesPage> {
           final result = await openDialog(
               context, nameController, ipController, macController);
           if (result == null || result.isEmpty) return;
-          setState(() {
-            myComputers.insert(
-              myComputers.length,
-              DeviceItem(
-                name: result[0],
-                ipAdd: result[1],
-                macAdd: result[2],
-              ),
-            );
-          });
+          _addDevice(result);
         },
         tooltip: "Add Device",
         child: const Icon(Icons.add),
