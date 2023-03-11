@@ -2,25 +2,47 @@ import 'package:flutter/material.dart';
 import 'package:wakeonlan/file_manager.dart';
 import 'package:wakeonlan/pages/devices_page.dart';
 import 'package:wakeonlan/pages/network_page.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 
-void main() => runApp(
-      MaterialApp(
-        home: const ExampleApp(),
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: const Color(0x00F2F2F2),
-        ),
-      ),
-    );
+void main() => runApp(const Home());
 
-class ExampleApp extends StatefulWidget {
-  const ExampleApp({super.key});
+class Home extends StatelessWidget {
+  const Home({super.key});
+
+  static final _defaultLightColorScheme =
+      ColorScheme.fromSeed(seedColor: Colors.blue);
+
+  static final _defaultDarkColorScheme =
+      ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark);
 
   @override
-  State<ExampleApp> createState() => _ExampleAppState();
+  Widget build(BuildContext context) {
+    return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
+      return MaterialApp(
+        title: 'WakeOnLan',
+        theme: ThemeData(
+          colorScheme: lightDynamic?.harmonized() ?? _defaultLightColorScheme,
+          useMaterial3: true,
+        ),
+        darkTheme: ThemeData(
+          colorScheme: darkDynamic?.harmonized() ?? _defaultDarkColorScheme,
+          useMaterial3: true,
+        ),
+        themeMode: ThemeMode.system,
+        home: const BottomNavigation(),
+      );
+    });
+  }
 }
 
-class _ExampleAppState extends State<ExampleApp> {
+class BottomNavigation extends StatefulWidget {
+  const BottomNavigation({super.key});
+
+  @override
+  State<BottomNavigation> createState() => _BottomNavigationState();
+}
+
+class _BottomNavigationState extends State<BottomNavigation> {
   int currentPageIndex = 0;
 
   @override

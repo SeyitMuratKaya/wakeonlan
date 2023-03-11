@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../wol/wol.dart';
 
 final List<DeviceItem> myComputers = <DeviceItem>[];
 
@@ -23,8 +24,19 @@ class _DeviceItemState extends State<DeviceItem> {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        onTap: () {
+        onTap: () async {
           //Wake the device
+          String mac = widget.macAdd;
+          String ipv4 = widget.ipAdd;
+
+          if (MACAddress.validate(mac) && IPv4Address.validate(ipv4)) {
+            MACAddress macAddress = MACAddress(mac);
+            IPv4Address ipv4Address = IPv4Address(ipv4);
+            WakeOnLAN wol = WakeOnLAN(ipv4Address, macAddress);
+            await wol.wake().then((value) => debugPrint("sent"));
+          } else {
+            debugPrint("error");
+          }
         },
         title: Text(widget.name),
         subtitle: Text("${widget.ipAdd} - ${widget.macAdd}"),

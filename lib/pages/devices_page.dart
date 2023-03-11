@@ -97,7 +97,7 @@ class _DevicesPageState extends State<DevicesPage> {
         title: const Text("Devices"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.refresh),
             tooltip: 'Refresh Devices',
             onPressed: () {},
           ),
