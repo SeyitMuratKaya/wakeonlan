@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:wakeonlan/file_manager.dart';
-import 'device_item.dart';
 import 'open_dialog.dart';
 
 final List<NetworkItem> lanComputers = <NetworkItem>[
@@ -51,16 +49,6 @@ class _NetworkItemState extends State<NetworkItem> {
       String allDevicesJson = jsonEncode(allDevices);
 
       fileManager.writeCounter(allDevicesJson);
-
-      setState(() {
-        myComputers.clear();
-        for (var element in allDevices) {
-          myComputers.add(DeviceItem(
-              name: element["name"],
-              ipAdd: element["ip"],
-              macAdd: element["mac"]));
-        }
-      });
     });
   }
 
@@ -85,7 +73,8 @@ class _NetworkItemState extends State<NetworkItem> {
               context, nameController, ipController, macController);
           if (result == null || result.isEmpty) return;
           // Save to local storage
-          // TODO: crash _addDevice(result);
+          _addDevice(result);
+          //Bug all devices are lost after removing last one and adding new network device.
         },
         title: Text(widget.name),
         subtitle: Text("${widget.ipAdd} - ${widget.macAdd}"),

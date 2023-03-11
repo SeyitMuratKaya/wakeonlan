@@ -35,14 +35,14 @@ class _DevicesPageState extends State<DevicesPage> {
         _devices = value;
         List<dynamic> allDevices = jsonDecode(_devices);
         setState(() {
-        myComputers.clear();
-        for (var element in allDevices) {
-          myComputers.add(DeviceItem(
-              name: element["name"],
-              ipAdd: element["ip"],
-              macAdd: element["mac"]));
-        }
-      });
+          myComputers.clear();
+          for (var element in allDevices) {
+            myComputers.add(DeviceItem(
+                name: element["name"],
+                ipAdd: element["ip"],
+                macAdd: element["mac"]));
+          }
+        });
         debugPrint("All devices $_devices");
       });
     });
@@ -54,8 +54,13 @@ class _DevicesPageState extends State<DevicesPage> {
     setState(() {
       if (myComputers.isNotEmpty) myComputers.removeLast();
     });
-    widget.storage.writeCounter("[]");
-    _devices = "[]";
+    widget.storage.readCounter().then((value) {
+      List<dynamic> devices = jsonDecode(value);
+      devices.removeLast();
+      String newList = jsonEncode(devices);
+      widget.storage.writeCounter(newList);
+      _devices = newList;
+    });
   }
 
   void _addDevice(List<String> result) {
