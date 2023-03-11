@@ -50,13 +50,13 @@ class _DevicesPageState extends State<DevicesPage> {
 
   String _devices = "";
 
-  void _deleteDevices() {
+  void _deleteDevices(int index) {
     setState(() {
-      if (myComputers.isNotEmpty) myComputers.removeLast();
+      if (myComputers.isNotEmpty) myComputers.removeAt(index);
     });
     widget.storage.readCounter().then((value) {
       List<dynamic> devices = jsonDecode(value);
-      devices.removeLast();
+      devices.removeAt(index);
       String newList = jsonEncode(devices);
       widget.storage.writeCounter(newList);
       _devices = newList;
@@ -99,16 +99,29 @@ class _DevicesPageState extends State<DevicesPage> {
           IconButton(
             icon: const Icon(Icons.delete),
             tooltip: 'Refresh Devices',
-            onPressed: () {
-              _deleteDevices();
-            },
+            onPressed: () {},
           ),
         ],
       ),
       body: ListView.builder(
         itemCount: myComputers.length,
         itemBuilder: (context, index) {
-          return myComputers[index];
+          return Dismissible(
+            key: ValueKey<DeviceItem>(myComputers[index]),
+            background: Container(
+              color: Colors.red,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: const [Icon(Icons.delete)]),
+              ),
+            ),
+            onDismissed: (DismissDirection direction) {
+              _deleteDevices(index);
+            },
+            child: myComputers[index],
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
