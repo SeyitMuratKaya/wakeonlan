@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../wol/wol.dart';
+import './wol/wake_on_lan.dart';
 
 final List<DeviceItem> myComputers = <DeviceItem>[];
 
@@ -20,6 +20,13 @@ class DeviceItem extends StatefulWidget {
 }
 
 class _DeviceItemState extends State<DeviceItem> {
+  void showMessage(String message) {
+    var snackBar = SnackBar(
+      content: Text(message),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -33,9 +40,9 @@ class _DeviceItemState extends State<DeviceItem> {
             MACAddress macAddress = MACAddress(mac);
             IPv4Address ipv4Address = IPv4Address(ipv4);
             WakeOnLAN wol = WakeOnLAN(ipv4Address, macAddress);
-            await wol.wake().then((value) => debugPrint("sent"));
+            await wol.wake().then((value) => showMessage("Packet Sent!"));
           } else {
-            debugPrint("error");
+            showMessage("Unable To Send!");
           }
         },
         title: Text(widget.name),

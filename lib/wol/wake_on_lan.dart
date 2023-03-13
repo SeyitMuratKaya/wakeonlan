@@ -1,9 +1,6 @@
 import 'dart:io';
+import 'package:convert/convert.dart';
 
-import './address_ipv4.dart';
-import './address_mac.dart';
-
-/// [WakeOnLAN] handles sending the actual wake-on-LAN magic packet to your network.
 class WakeOnLAN {
   static const _maxPort = 65535;
   final IPv4Address ipv4Address;
@@ -12,9 +9,6 @@ class WakeOnLAN {
 
   WakeOnLAN._internal(this.ipv4Address, this.macAddress, this.port);
 
-  /// Creates [WakeOnLAN] from an [IPv4Address], [MACAddress], and optionally defined [port].
-  ///
-  /// The port is defaulted to 9, the standard port for Wake on LAN functionality.
   factory WakeOnLAN(
     IPv4Address ipv4,
     MACAddress mac, {
@@ -24,12 +18,6 @@ class WakeOnLAN {
     return WakeOnLAN._internal(ipv4, mac, port);
   }
 
-  /// Creates [WakeOnLAN] from an IPv4 address string and MAC address string, and optionally defined [port].
-  ///
-  /// This allows directly creating the class without needing to instantiate [IPv4Address] and [MACAddress] instances.
-  /// The MAC address must be delimited with colons (:).
-  ///
-  /// The port is defaulted to 9, the standard port for Wake on LAN functionality.
   factory WakeOnLAN.fromString(
     String ipv4,
     String mac, {
@@ -43,12 +31,6 @@ class WakeOnLAN {
     );
   }
 
-  /// Assembles the magic packet for wake-on-LAN functionality.
-  ///
-  /// Total size of the wake-on-LAN magic packet is 102 bytes, or 816 bits.
-  ///
-  /// First 6 bytes (48 bits) are 0xFF (255) with the remaining 96 bytes (768 bits) as the 6 byte (48 bit)
-  /// MAC address repeated 16 times as specified by the wake-on-LAN specification.
   List<int> magicPacket() {
     List<int> data = [];
 
@@ -62,10 +44,6 @@ class WakeOnLAN {
     return data;
   }
 
-  /// Sends the wake on LAN packets to the [IPv4Address], [MACAddress], and [port] defined on creation.
-  ///
-  /// A [RawDatagramSocket] will be created and bound to any IPv4 address and port 0.
-  /// The socket will then be used to send the constructed packet to the address in [IPv4Address] and [port].
   Future<void> wake() async {
     return RawDatagramSocket.bind(InternetAddress.anyIPv4, 0).then((socket) {
       final addr = ipv4Address.address;
@@ -75,5 +53,63 @@ class WakeOnLAN {
       socket.send(magicPacket(), iAddr, port);
       socket.close();
     });
+  }
+}
+
+class MACAddress {
+  final String address;
+  final String delimiter;
+  final List<int> bytes;
+
+  MACAddress._internal(this.address, this.delimiter, this.bytes);
+
+  factory MACAddress(
+    String address, {
+    String delimiter = ':',
+  }) {
+    if (!MACAddress.validate(address, delimiter: delimiter)) {
+      throw const FormatException('Not a valid MAC address string');
+    }
+
+    List<String> split = address.split(delimiter);
+    List<int> bytes = split.map((octet) => hex.decode(octet)[0]).toList();
+
+    return MACAddress._internal(address, delimiter, bytes);
+  }
+  
+  static bool validate(
+    String? address, {
+    String delimiter = ':',
+  }) {
+    if (address == null) return false;
+
+    final delim = delimiter.split('').map((c) => '\\$c').toList().join();
+    final regex = r'^([0-9A-Fa-f]{2}' + delim + r'){5}([0-9A-Fa-f]{2})$';
+    RegExp exp = RegExp(regex);
+
+    return exp.hasMatch(address);
+  }
+}
+
+class IPv4Address {
+  final String address;
+
+  IPv4Address._internal(this.address);
+
+  factory IPv4Address(String address) {
+    if (!IPv4Address.validate(address)) {
+      throw const FormatException('Not a valid IPv4 address string');
+    }
+
+    return IPv4Address._internal(address);
+  }
+  
+  static bool validate(String? address) {
+    if (address == null) return false;
+
+    const regex = r"\b((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.|$)){4}\b";
+    RegExp exp = RegExp(regex);
+
+    return exp.hasMatch(address);
   }
 }

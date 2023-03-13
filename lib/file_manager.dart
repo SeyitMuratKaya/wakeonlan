@@ -18,7 +18,13 @@ class FileManager {
       final file = await _localFile;
 
       // Read the file
-      final contents = await file.readAsString();
+
+      String contents;
+      try {
+        contents = await file.readAsString();
+      } catch (e) {
+        contents = "[]";
+      }
 
       return contents;
     } catch (e) {
