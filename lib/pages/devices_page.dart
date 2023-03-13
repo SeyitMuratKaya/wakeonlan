@@ -3,7 +3,6 @@ import 'package:wakeonlan/file_manager.dart';
 import 'dart:convert';
 import '../device_item.dart';
 import '../open_dialog.dart';
-import 'dart:ui';
 
 class DevicesPage extends StatefulWidget {
   const DevicesPage({super.key, required this.storage});
@@ -125,6 +124,25 @@ class _DevicesPageState extends State<DevicesPage> {
     });
   }
 
+  Future<void> _refresh() async {
+    widget.storage.readCounter().then((value) {
+      setState(() {
+        _devices = value;
+        List<dynamic> allDevices = jsonDecode(_devices);
+        setState(() {
+          myComputers.clear();
+          for (var element in allDevices) {
+            myComputers.add(DeviceItem(
+                name: element["name"],
+                ipAdd: element["ip"],
+                macAdd: element["mac"]));
+          }
+        });
+        debugPrint("All devices $_devices");
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,37 +150,40 @@ class _DevicesPageState extends State<DevicesPage> {
         title: const Text("Devices"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Devices',
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
             onPressed: () {},
           ),
         ],
       ),
-      body: ReorderableListView.builder(
-        itemCount: myComputers.length,
-        itemBuilder: (context, index) {
-          return Dismissible(
-            key: ValueKey<DeviceItem>(myComputers[index]),
-            background: Container(
-              color: Colors.red,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: const [Icon(Icons.delete)]),
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: ReorderableListView.builder(
+          itemCount: myComputers.length,
+          itemBuilder: (context, index) {
+            return Dismissible(
+              key: ValueKey<DeviceItem>(myComputers[index]),
+              background: Container(
+                color: Colors.red,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: const [Icon(Icons.delete)]),
+                ),
               ),
-            ),
-            onDismissed: (DismissDirection direction) {
-              _showSnackbar("Deleted", index, [
-                myComputers[index].name,
-                myComputers[index].ipAdd,
-                myComputers[index].macAdd
-              ]);
-            },
-            child: myComputers[index],
-          );
-        },
-        onReorder: _reorderDevices,
+              onDismissed: (DismissDirection direction) {
+                _showSnackbar("Deleted", index, [
+                  myComputers[index].name,
+                  myComputers[index].ipAdd,
+                  myComputers[index].macAdd
+                ]);
+              },
+              child: myComputers[index],
+            );
+          },
+          onReorder: _reorderDevices,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
