@@ -3,6 +3,7 @@ import 'package:wakeonlan/file_manager.dart';
 import 'dart:convert';
 import '../device_item.dart';
 import '../open_dialog.dart';
+import 'dart:ui';
 
 class DevicesPage extends StatefulWidget {
   const DevicesPage({super.key, required this.storage});
@@ -104,6 +105,26 @@ class _DevicesPageState extends State<DevicesPage> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void _reorderDevices(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) {
+      newIndex -= 1;
+    }
+
+    List<dynamic> allDevices = jsonDecode(_devices);
+
+    final draggedDevice = allDevices.removeAt(oldIndex);
+    allDevices.insert(newIndex, draggedDevice);
+    String allDevicesJson = jsonEncode(allDevices);
+    widget.storage.writeCounter(allDevicesJson);
+
+    _devices = allDevicesJson;
+
+    setState(() {
+      final draggedItem = myComputers.removeAt(oldIndex);
+      myComputers.insert(newIndex, draggedItem);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,7 +138,7 @@ class _DevicesPageState extends State<DevicesPage> {
           ),
         ],
       ),
-      body: ListView.builder(
+      body: ReorderableListView.builder(
         itemCount: myComputers.length,
         itemBuilder: (context, index) {
           return Dismissible(
@@ -141,6 +162,7 @@ class _DevicesPageState extends State<DevicesPage> {
             child: myComputers[index],
           );
         },
+        onReorder: _reorderDevices,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
