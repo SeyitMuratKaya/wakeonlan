@@ -63,12 +63,12 @@ class _DevicesPageState extends State<DevicesPage> {
     });
   }
 
-  void _addDevice(List<String> result) {
+  void _addDevice(List<String> result, int index) {
     Device newDevice = Device(name: result[0], ip: result[1], mac: result[2]);
 
     List<dynamic> allDevices = jsonDecode(_devices);
 
-    allDevices.add(newDevice);
+    allDevices.insert(index, newDevice);
 
     String allDevicesJson = jsonEncode(allDevices);
 
@@ -88,6 +88,20 @@ class _DevicesPageState extends State<DevicesPage> {
     });
 
     _devices = allDevicesJson;
+  }
+
+  void _showSnackbar(String message, int index, List<String> result) {
+    var snackBar = SnackBar(
+      content: Text(message),
+      action: SnackBarAction(
+          label: "Undo",
+          onPressed: () {
+            _addDevice(result, index);
+          }),
+    );
+    _deleteDevices(index);
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -118,7 +132,11 @@ class _DevicesPageState extends State<DevicesPage> {
               ),
             ),
             onDismissed: (DismissDirection direction) {
-              _deleteDevices(index);
+              _showSnackbar("Deleted", index, [
+                myComputers[index].name,
+                myComputers[index].ipAdd,
+                myComputers[index].macAdd
+              ]);
             },
             child: myComputers[index],
           );
@@ -130,7 +148,7 @@ class _DevicesPageState extends State<DevicesPage> {
           final result = await openDialog(
               context, nameController, ipController, macController);
           if (result == null || result.isEmpty) return;
-          _addDevice(result);
+          _addDevice(result, myComputers.length);
         },
         tooltip: "Add Device",
         child: const Icon(Icons.add),
