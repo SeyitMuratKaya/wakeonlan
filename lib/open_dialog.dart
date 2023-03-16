@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 Future<List<String>?> openDialog(
-        context, nameController, ipController, macController) =>
+        context, message, nameController, ipController, macController) =>
     showDialog<List<String>>(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("Add Device"),
+        title: Text(message),
         content: SingleChildScrollView(
           child: ListBody(
             children: [

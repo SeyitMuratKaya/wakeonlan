@@ -70,7 +70,7 @@ class _NetworkItemState extends State<NetworkItem> {
           ipController.text = widget.ipAdd;
           macController.text = widget.macAdd;
           final result = await openDialog(
-              context, nameController, ipController, macController);
+              context,"Add Device" ,nameController, ipController, macController);
           if (result == null || result.isEmpty) return;
           // Save to local storage
           _addDevice(result);

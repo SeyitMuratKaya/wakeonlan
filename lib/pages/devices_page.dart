@@ -37,10 +37,8 @@ class _DevicesPageState extends State<DevicesPage> {
         setState(() {
           myComputers.clear();
           for (var element in allDevices) {
-            myComputers.add(DeviceItem(
-                name: element["name"],
-                ipAdd: element["ip"],
-                macAdd: element["mac"]));
+            myComputers
+                .add(Item(element["name"], element["ip"], element["mac"]));
           }
         });
         debugPrint("All devices $_devices");
@@ -79,10 +77,7 @@ class _DevicesPageState extends State<DevicesPage> {
       setState(() {
         myComputers.clear();
         for (var element in devices) {
-          myComputers.add(DeviceItem(
-              name: element["name"],
-              ipAdd: element["ip"],
-              macAdd: element["mac"]));
+          myComputers.add(Item(element["name"], element["ip"], element["mac"]));
         }
       });
     });
@@ -132,13 +127,36 @@ class _DevicesPageState extends State<DevicesPage> {
         setState(() {
           myComputers.clear();
           for (var element in allDevices) {
-            myComputers.add(DeviceItem(
-                name: element["name"],
-                ipAdd: element["ip"],
-                macAdd: element["mac"]));
+            myComputers
+                .add(Item(element["name"], element["ip"], element["mac"]));
           }
         });
         debugPrint("All devices $_devices");
+      });
+    });
+  }
+
+  void _editDevice(List<String> result) {
+    var resultIndex =
+        myComputers.indexWhere((element) => element.id == result[3]);
+
+    List<dynamic> allDevices = jsonDecode(_devices);
+    final editedDevice = allDevices.removeAt(resultIndex);
+    editedDevice["name"] = result[0];
+    editedDevice["ip"] = result[1];
+    editedDevice["mac"] = result[2];
+    allDevices.insert(resultIndex, editedDevice);
+    String allDevicesJson = jsonEncode(allDevices);
+    widget.storage.writeCounter(allDevicesJson);
+    _devices = allDevicesJson;
+
+    widget.storage.readCounter().then((value) {
+      List<dynamic> devices = jsonDecode(value);
+      setState(() {
+        myComputers.clear();
+        for (var element in devices) {
+          myComputers.add(Item(element["name"], element["ip"], element["mac"]));
+        }
       });
     });
   }
@@ -162,7 +180,8 @@ class _DevicesPageState extends State<DevicesPage> {
           itemCount: myComputers.length,
           itemBuilder: (context, index) {
             return Dismissible(
-              key: ValueKey<DeviceItem>(myComputers[index]),
+              key: ValueKey<Item>(myComputers[index]),
+              direction: DismissDirection.endToStart,
               background: Container(
                 color: Colors.red,
                 child: Padding(
@@ -179,7 +198,12 @@ class _DevicesPageState extends State<DevicesPage> {
                   myComputers[index].macAdd
                 ]);
               },
-              child: myComputers[index],
+              child: DeviceItem(
+                item: myComputers[index],
+                onConfirm: (result) {
+                  _editDevice(result);
+                },
+              ),
             );
           },
           onReorder: _reorderDevices,
@@ -188,8 +212,8 @@ class _DevicesPageState extends State<DevicesPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           //save to local storage
-          final result = await openDialog(
-              context, nameController, ipController, macController);
+          final result = await openDialog(context, "Add Device", nameController,
+              ipController, macController);
           if (result == null || result.isEmpty) return;
           _addDevice(result, myComputers.length);
         },
