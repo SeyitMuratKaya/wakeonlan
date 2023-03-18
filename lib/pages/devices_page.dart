@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wakeonlan/file_manager.dart';
 import 'dart:convert';
 import '../device_item.dart';
+import '../models/models.dart';
 import '../open_dialog.dart';
 
 class DevicesPage extends StatefulWidget {
@@ -17,6 +18,7 @@ class _DevicesPageState extends State<DevicesPage> {
   final nameController = TextEditingController();
   final ipController = TextEditingController();
   final macController = TextEditingController();
+  final List<Item> myComputers = <Item>[];
 
   @override
   void dispose() {
@@ -48,19 +50,6 @@ class _DevicesPageState extends State<DevicesPage> {
 
   String _devices = "";
 
-  void _deleteDevices(int index) {
-    setState(() {
-      if (myComputers.isNotEmpty) myComputers.removeAt(index);
-    });
-    widget.storage.readCounter().then((value) {
-      List<dynamic> devices = jsonDecode(value);
-      devices.removeAt(index);
-      String newList = jsonEncode(devices);
-      widget.storage.writeCounter(newList);
-      _devices = newList;
-    });
-  }
-
   void _addDevice(List<String> result, int index) {
     Device newDevice = Device(name: result[0], ip: result[1], mac: result[2]);
 
@@ -85,18 +74,17 @@ class _DevicesPageState extends State<DevicesPage> {
     _devices = allDevicesJson;
   }
 
-  void _showSnackbar(String message, int index, List<String> result) {
-    var snackBar = SnackBar(
-      content: Text(message),
-      action: SnackBarAction(
-          label: "Undo",
-          onPressed: () {
-            _addDevice(result, index);
-          }),
-    );
-    _deleteDevices(index);
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  void _deleteDevices(int index) {
+    setState(() {
+      if (myComputers.isNotEmpty) myComputers.removeAt(index);
+    });
+    widget.storage.readCounter().then((value) {
+      List<dynamic> devices = jsonDecode(value);
+      devices.removeAt(index);
+      String newList = jsonEncode(devices);
+      widget.storage.writeCounter(newList);
+      _devices = newList;
+    });
   }
 
   void _reorderDevices(int oldIndex, int newIndex) {
@@ -116,23 +104,6 @@ class _DevicesPageState extends State<DevicesPage> {
     setState(() {
       final draggedItem = myComputers.removeAt(oldIndex);
       myComputers.insert(newIndex, draggedItem);
-    });
-  }
-
-  Future<void> _refresh() async {
-    widget.storage.readCounter().then((value) {
-      setState(() {
-        _devices = value;
-        List<dynamic> allDevices = jsonDecode(_devices);
-        setState(() {
-          myComputers.clear();
-          for (var element in allDevices) {
-            myComputers
-                .add(Item(element["name"], element["ip"], element["mac"]));
-          }
-        });
-        debugPrint("All devices $_devices");
-      });
     });
   }
 
@@ -159,6 +130,37 @@ class _DevicesPageState extends State<DevicesPage> {
         }
       });
     });
+  }
+
+  Future<void> _refresh() async {
+    widget.storage.readCounter().then((value) {
+      setState(() {
+        _devices = value;
+        List<dynamic> allDevices = jsonDecode(_devices);
+        setState(() {
+          myComputers.clear();
+          for (var element in allDevices) {
+            myComputers
+                .add(Item(element["name"], element["ip"], element["mac"]));
+          }
+        });
+        debugPrint("All devices $_devices");
+      });
+    });
+  }
+
+  void _showSnackbar(String message, int index, List<String> result) {
+    var snackBar = SnackBar(
+      content: Text(message),
+      action: SnackBarAction(
+          label: "Undo",
+          onPressed: () {
+            _addDevice(result, index);
+          }),
+    );
+    _deleteDevices(index);
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override

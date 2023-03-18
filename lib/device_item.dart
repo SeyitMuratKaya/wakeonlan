@@ -1,18 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:wakeonlan/file_manager.dart';
 import './wol/wake_on_lan.dart';
+import 'models/models.dart';
 import 'open_dialog.dart';
-
-final List<Item> myComputers = <Item>[];
-
-class Item {
-  String id = UniqueKey().toString();
-  String name;
-  String ipAdd;
-  String macAdd;
-
-  Item(this.name, this.ipAdd, this.macAdd);
-}
 
 class DeviceItem extends StatefulWidget {
   const DeviceItem({
@@ -48,6 +38,7 @@ class _DeviceItemState extends State<DeviceItem> {
     var snackBar = SnackBar(
       content: Text(message),
     );
+    ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
@@ -69,6 +60,12 @@ class _DeviceItemState extends State<DeviceItem> {
             showMessage("Unable To Send!");
           }
         },
+        leading: Badge(
+          backgroundColor: widget.item.status ? Colors.green : Colors.red,
+          child: CircleAvatar(
+            child: Text(widget.item.name[0].toUpperCase()),
+          ),
+        ),
         title: Text(widget.item.name),
         subtitle: Text("${widget.item.ipAdd} - ${widget.item.macAdd}"),
         trailing: IconButton(

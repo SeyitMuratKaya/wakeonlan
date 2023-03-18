@@ -21,11 +21,13 @@ Future<List<String>?> openDialog(
                   }
                   return null;
                 },
+                textCapitalization: TextCapitalization.sentences,
                 controller: nameController,
                 decoration: const InputDecoration(
                   hintText: "Device Name",
                   labelText: "Device Name",
                 ),
+                textInputAction: TextInputAction.next,
               ),
               TextFormField(
                 validator: (value) {
@@ -39,6 +41,7 @@ Future<List<String>?> openDialog(
                   hintText: "Ip Address",
                   labelText: "Ip Address",
                 ),
+                textInputAction: TextInputAction.next,
               ),
               TextFormField(
                 validator: (value) {
@@ -52,6 +55,7 @@ Future<List<String>?> openDialog(
                   hintText: "Mac Address",
                   labelText: "Mac Address",
                 ),
+                textInputAction: TextInputAction.done,
               ),
             ],
           ),
@@ -65,15 +69,15 @@ Future<List<String>?> openDialog(
             child: const Text("Cancel")),
         ElevatedButton(
             onPressed: () {
-              if(formKey.currentState!.validate()){
+              if (formKey.currentState!.validate()) {
                 Navigator.of(context).pop([
-                nameController.text.toString(),
-                ipController.text.toString(),
-                macController.text.toString()
-              ]);
-              nameController.clear();
-              ipController.clear();
-              macController.clear();
+                  nameController.text.toString(),
+                  ipController.text.toString(),
+                  macController.text.toString()
+                ]);
+                nameController.clear();
+                ipController.clear();
+                macController.clear();
               }
             },
             child: const Text("Save")),

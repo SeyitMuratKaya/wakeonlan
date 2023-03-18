@@ -1,32 +1,16 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:wakeonlan/file_manager.dart';
+import 'models/models.dart';
 import 'open_dialog.dart';
-
-final List<NetworkItem> lanComputers = <NetworkItem>[
-  const NetworkItem(
-    name: "Lan Computer 1",
-    ipAdd: "192.168.1.5",
-    macAdd: "38:f9:d3:a4:96:ab",
-  ),
-  const NetworkItem(
-    name: "Lan Computer 2",
-    ipAdd: "192.168.1.7",
-    macAdd: "0e:22:88:d6:97:e0",
-  ),
-];
 
 class NetworkItem extends StatefulWidget {
   const NetworkItem({
     super.key,
-    required this.name,
-    required this.ipAdd,
-    required this.macAdd,
+    required this.item,
   });
 
-  final String name;
-  final String ipAdd;
-  final String macAdd;
+  final Item item;
 
   @override
   State<NetworkItem> createState() => _NetworkItemState();
@@ -66,22 +50,16 @@ class _NetworkItemState extends State<NetworkItem> {
     return Card(
       child: ListTile(
         onTap: () async {
-          nameController.text = widget.name;
-          ipController.text = widget.ipAdd;
-          macController.text = widget.macAdd;
-          final result = await openDialog(
-              context,"Add Device" ,nameController, ipController, macController);
+          nameController.text = "";
+          ipController.text = widget.item.ipAdd;
+          macController.text = "";
+          final result = await openDialog(context, "Add Device", nameController,
+              ipController, macController);
           if (result == null || result.isEmpty) return;
           // Save to local storage
           _addDevice(result);
-          //Bug all devices are lost after removing last one and adding new network device.
         },
-        title: Text(widget.name),
-        subtitle: Text("${widget.ipAdd} - ${widget.macAdd}"),
-        trailing: IconButton(
-          icon: const Icon(Icons.more_vert),
-          onPressed: () {},
-        ),
+        title: Text(widget.item.ipAdd),
       ),
     );
   }
