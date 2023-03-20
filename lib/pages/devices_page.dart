@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wakeonlan/file_manager.dart';
 import 'dart:convert';
+import 'dart:async';
 import '../device_item.dart';
 import '../models/models.dart';
 import '../open_dialog.dart';
@@ -19,6 +20,7 @@ class _DevicesPageState extends State<DevicesPage> {
   final ipController = TextEditingController();
   final macController = TextEditingController();
   final List<Item> myComputers = <Item>[];
+  Timer? timer;
 
   @override
   void dispose() {
@@ -27,6 +29,7 @@ class _DevicesPageState extends State<DevicesPage> {
     ipController.dispose();
     macController.dispose();
     super.dispose();
+    timer?.cancel();
   }
 
   @override
@@ -46,6 +49,18 @@ class _DevicesPageState extends State<DevicesPage> {
         debugPrint("All devices $_devices");
       });
     });
+    timer = Timer.periodic(
+        const Duration(seconds: 5), (Timer t) => checkDeviceStatus());
+  }
+
+  void checkDeviceStatus() {
+    for (var element in myComputers) {
+      if (scannedDevices.contains(element.ipAdd)) {
+        setState(() {
+          element.status = true;
+        });
+      }
+    }
   }
 
   String _devices = "";

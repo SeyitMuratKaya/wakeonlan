@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lan_scanner/lan_scanner.dart';
 import 'package:wakeonlan/file_manager.dart';
+import 'package:wakeonlan/models/models.dart';
 import 'package:wakeonlan/pages/devices_page.dart';
 import 'package:wakeonlan/pages/network_page.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -45,6 +47,26 @@ class BottomNavigation extends StatefulWidget {
 class _BottomNavigationState extends State<BottomNavigation> {
   int currentPageIndex = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    scan();
+  }
+
+  Future<void> scan() async {
+    final scanner = LanScanner();
+
+    final stream =
+        scanner.icmpScan('192.168.1', progressCallback: (progress) {});
+
+    stream.listen((HostModel device) {
+      debugPrint("Found host: ${device.ip}");
+      setState(() {
+        scannedDevices.add(device.ip);
+      });
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

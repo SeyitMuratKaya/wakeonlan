@@ -9,3 +9,5 @@ class Item {
 
   Item(this.name, this.ipAdd, this.macAdd);
 }
+
+List<String> scannedDevices = <String>[];
