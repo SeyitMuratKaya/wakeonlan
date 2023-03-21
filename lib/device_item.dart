@@ -27,7 +27,6 @@ class _DeviceItemState extends State<DeviceItem> {
 
   @override
   void dispose() {
-    // Clean up the controller when the widget is disposed.
     nameController.dispose();
     ipController.dispose();
     macController.dispose();
@@ -42,23 +41,41 @@ class _DeviceItemState extends State<DeviceItem> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
+  void sendMagicPacket(String ipAdd, String macAdd) async {
+    if (MACAddress.validate(macAdd) && IPv4Address.validate(ipAdd)) {
+      MACAddress macAddress = MACAddress(macAdd);
+      IPv4Address ipv4Address = IPv4Address(ipAdd);
+
+      WakeOnLAN wol = WakeOnLAN(ipv4Address, macAddress);
+
+      await wol.wake().then((value) => showMessage("Packet Sent!"));
+    } else {
+      showMessage("Unable To Send!");
+    }
+  }
+
+  void displayDialog() async {
+    nameController.text = widget.item.name;
+    ipController.text = widget.item.ipAdd;
+    macController.text = widget.item.macAdd;
+
+    var result = await openDialog(
+        context, "Edit Device", nameController, ipController, macController);
+    if (result == null || result.isEmpty) return;
+
+    result.add(widget.item.id);
+    widget.onConfirm(result);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        onTap: () async {
+        onTap: () {
           //Wake the device
-          String mac = widget.item.macAdd;
-          String ipv4 = widget.item.ipAdd;
-
-          if (MACAddress.validate(mac) && IPv4Address.validate(ipv4)) {
-            MACAddress macAddress = MACAddress(mac);
-            IPv4Address ipv4Address = IPv4Address(ipv4);
-            WakeOnLAN wol = WakeOnLAN(ipv4Address, macAddress);
-            await wol.wake().then((value) => showMessage("Packet Sent!"));
-          } else {
-            showMessage("Unable To Send!");
-          }
+          String macAdd = widget.item.macAdd;
+          String ipAdd = widget.item.ipAdd;
+          sendMagicPacket(ipAdd, macAdd);
         },
         leading: Badge(
           backgroundColor: widget.item.status ? Colors.green : Colors.red,
@@ -70,17 +87,7 @@ class _DeviceItemState extends State<DeviceItem> {
         subtitle: Text("${widget.item.ipAdd} - ${widget.item.macAdd}"),
         trailing: IconButton(
           icon: const Icon(Icons.more_vert),
-          onPressed: () async {
-            nameController.text = widget.item.name;
-            ipController.text = widget.item.ipAdd;
-            macController.text = widget.item.macAdd;
-            //Edit information
-            var result = await openDialog(context, "Edit Device",
-                nameController, ipController, macController);
-            if (result == null || result.isEmpty) return;
-            result.add(widget.item.id);
-            widget.onConfirm(result);
-          },
+          onPressed: displayDialog,
         ),
       ),
     );

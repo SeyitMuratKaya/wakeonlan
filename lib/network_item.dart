@@ -23,6 +23,15 @@ class _NetworkItemState extends State<NetworkItem> {
 
   FileManager fileManager = FileManager();
 
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    nameController.dispose();
+    ipController.dispose();
+    macController.dispose();
+    super.dispose();
+  }
+
   void _addDevice(List<String> result) {
     fileManager.readCounter().then((value) {
       Device newDevice = Device(name: result[0], ip: result[1], mac: result[2]);
@@ -34,15 +43,6 @@ class _NetworkItemState extends State<NetworkItem> {
 
       fileManager.writeCounter(allDevicesJson);
     });
-  }
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    nameController.dispose();
-    ipController.dispose();
-    macController.dispose();
-    super.dispose();
   }
 
   @override

@@ -3,8 +3,6 @@ import 'package:lan_scanner/lan_scanner.dart';
 import '../models/models.dart';
 import '../network_item.dart';
 
-final List<Item> lanComputers = <Item>[];
-
 class NetworkPage extends StatefulWidget {
   const NetworkPage({super.key});
 
@@ -13,6 +11,7 @@ class NetworkPage extends StatefulWidget {
 }
 
 class _NetworkPageState extends State<NetworkPage> {
+  final List<Item> lanComputers = <Item>[];
   double progressIndicator = 0.0;
   bool scanState = false;
 
@@ -22,6 +21,8 @@ class _NetworkPageState extends State<NetworkPage> {
   }
 
   Future<void> scan() async {
+    if (!scanState) return;
+
     setState(() {
       lanComputers.clear();
       scanState = true;
@@ -58,14 +59,13 @@ class _NetworkPageState extends State<NetworkPage> {
               child: LinearProgressIndicator(value: progressIndicator)),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Devices',
-            onPressed: () {
-              if (!scanState) {
-                scan();
-              }
-            },
+          Visibility(
+            visible: lanComputers.isNotEmpty,
+            child: IconButton(
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Refresh Devices',
+              onPressed: scan,
+            ),
           ),
         ],
       ),
@@ -75,13 +75,12 @@ class _NetworkPageState extends State<NetworkPage> {
                 width: MediaQuery.of(context).size.height / 4,
                 height: MediaQuery.of(context).size.width / 4,
                 child: ElevatedButton(
-                    onPressed: () {
-                      scan();
-                    },
-                    child: const Text(
-                      "Scan",
-                      textScaleFactor: 2,
-                    )),
+                  onPressed: scan,
+                  child: const Text(
+                    "Scan",
+                    textScaleFactor: 2,
+                  ),
+                ),
               ),
             )
           : ListView.builder(

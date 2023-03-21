@@ -65,6 +65,9 @@ Future<List<String>?> openDialog(
         TextButton(
             onPressed: () {
               Navigator.pop(context);
+              nameController.clear();
+              ipController.clear();
+              macController.clear();
             },
             child: const Text("Cancel")),
         ElevatedButton(

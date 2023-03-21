@@ -19,18 +19,9 @@ class _DevicesPageState extends State<DevicesPage> {
   final nameController = TextEditingController();
   final ipController = TextEditingController();
   final macController = TextEditingController();
+  String _devices = "";
   final List<Item> myComputers = <Item>[];
   Timer? timer;
-
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    nameController.dispose();
-    ipController.dispose();
-    macController.dispose();
-    super.dispose();
-    timer?.cancel();
-  }
 
   @override
   void initState() {
@@ -48,9 +39,20 @@ class _DevicesPageState extends State<DevicesPage> {
         });
         debugPrint("All devices $_devices");
       });
+      checkDeviceStatus();
     });
     timer = Timer.periodic(
         const Duration(seconds: 5), (Timer t) => checkDeviceStatus());
+  }
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    nameController.dispose();
+    ipController.dispose();
+    macController.dispose();
+    super.dispose();
+    timer?.cancel();
   }
 
   void checkDeviceStatus() {
@@ -62,8 +64,6 @@ class _DevicesPageState extends State<DevicesPage> {
       }
     }
   }
-
-  String _devices = "";
 
   void _addDevice(List<String> result, int index) {
     Device newDevice = Device(name: result[0], ip: result[1], mac: result[2]);
@@ -167,6 +167,7 @@ class _DevicesPageState extends State<DevicesPage> {
   void _showSnackbar(String message, int index, List<String> result) {
     var snackBar = SnackBar(
       content: Text(message),
+      behavior: SnackBarBehavior.floating,
       action: SnackBarAction(
           label: "Undo",
           onPressed: () {

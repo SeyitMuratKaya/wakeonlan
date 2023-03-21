@@ -66,7 +66,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       });
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,11 +79,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
         selectedIndex: currentPageIndex,
         destinations: const <Widget>[
           NavigationDestination(
-            icon: Icon(Icons.list),
+            icon: Icon(Icons.devices),
             label: 'Devices',
           ),
           NavigationDestination(
-            icon: Icon(Icons.computer),
+            icon: Icon(Icons.lan_outlined),
             label: 'Network',
           ),
         ],
