@@ -5,6 +5,7 @@ import 'dart:async';
 import '../device_item.dart';
 import '../models/models.dart';
 import '../open_dialog.dart';
+import './settings_page.dart';
 
 class DevicesPage extends StatefulWidget {
   const DevicesPage({super.key, required this.storage});
@@ -188,7 +189,12 @@ class _DevicesPageState extends State<DevicesPage> {
           IconButton(
             icon: const Icon(Icons.settings),
             tooltip: 'Settings',
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FirstPage()),
+              );
+            },
           ),
         ],
       ),
