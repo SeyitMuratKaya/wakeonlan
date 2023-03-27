@@ -1,36 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:lan_scanner/lan_scanner.dart';
+import 'package:provider/provider.dart';
 import 'package:wakeonlan/file_manager.dart';
 import 'package:wakeonlan/models/models.dart';
 import 'package:wakeonlan/pages/devices_page.dart';
 import 'package:wakeonlan/pages/network_page.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 
-void main() => runApp(const Home());
+void main() => runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AppTheme()),
+      ],
+      child: const Home(),
+    ));
 
 class Home extends StatelessWidget {
   const Home({super.key});
 
-  static final _defaultLightColorScheme =
-      ColorScheme.fromSeed(seedColor: Colors.blue);
-
-  static final _defaultDarkColorScheme =
-      ColorScheme.fromSeed(seedColor: Colors.blue, brightness: Brightness.dark);
-
   @override
   Widget build(BuildContext context) {
+    final appTheme = Provider.of<AppTheme>(context);
+
+    final defaultLightColorScheme = ColorScheme.fromSeed(
+        seedColor: appTheme.customColorSelected ? appTheme.color : Colors.blue);
+
+    final defaultDarkColorScheme = ColorScheme.fromSeed(
+        seedColor: appTheme.customColorSelected ? appTheme.color : Colors.blue,
+        brightness: Brightness.dark);
+
     return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
       return MaterialApp(
         title: 'WakeOnLan',
         theme: ThemeData(
-          colorScheme: lightDynamic?.harmonized() ?? _defaultLightColorScheme,
+          colorScheme: defaultLightColorScheme,
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
-          colorScheme: darkDynamic?.harmonized() ?? _defaultDarkColorScheme,
+          colorScheme: defaultDarkColorScheme,
           useMaterial3: true,
         ),
-        themeMode: ThemeMode.system,
+        themeMode: appTheme.themeMode,
         home: const BottomNavigation(),
       );
     });

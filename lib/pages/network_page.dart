@@ -21,7 +21,7 @@ class _NetworkPageState extends State<NetworkPage> {
   }
 
   Future<void> scan() async {
-    if (!scanState) return;
+    if (scanState) return;
 
     setState(() {
       lanComputers.clear();
