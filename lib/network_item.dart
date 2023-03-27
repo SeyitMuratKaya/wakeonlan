@@ -33,7 +33,7 @@ class _NetworkItemState extends State<NetworkItem> {
   }
 
   void _addDevice(List<String> result) {
-    fileManager.readCounter().then((value) {
+    fileManager.readDevices().then((value) {
       Device newDevice = Device(name: result[0], ip: result[1], mac: result[2]);
       List<dynamic> allDevices = jsonDecode(value);
 
@@ -41,7 +41,7 @@ class _NetworkItemState extends State<NetworkItem> {
 
       String allDevicesJson = jsonEncode(allDevices);
 
-      fileManager.writeCounter(allDevicesJson);
+      fileManager.writeDevices(allDevicesJson);
     });
   }
 

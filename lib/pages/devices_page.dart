@@ -27,7 +27,7 @@ class _DevicesPageState extends State<DevicesPage> {
   @override
   void initState() {
     super.initState();
-    widget.storage.readCounter().then((value) {
+    widget.storage.readDevices().then((value) {
       setState(() {
         _devices = value;
         List<dynamic> allDevices = jsonDecode(_devices);
@@ -75,9 +75,9 @@ class _DevicesPageState extends State<DevicesPage> {
 
     String allDevicesJson = jsonEncode(allDevices);
 
-    widget.storage.writeCounter(allDevicesJson);
+    widget.storage.writeDevices(allDevicesJson);
 
-    widget.storage.readCounter().then((value) {
+    widget.storage.readDevices().then((value) {
       List<dynamic> devices = jsonDecode(value);
       setState(() {
         myComputers.clear();
@@ -94,11 +94,11 @@ class _DevicesPageState extends State<DevicesPage> {
     setState(() {
       if (myComputers.isNotEmpty) myComputers.removeAt(index);
     });
-    widget.storage.readCounter().then((value) {
+    widget.storage.readDevices().then((value) {
       List<dynamic> devices = jsonDecode(value);
       devices.removeAt(index);
       String newList = jsonEncode(devices);
-      widget.storage.writeCounter(newList);
+      widget.storage.writeDevices(newList);
       _devices = newList;
     });
   }
@@ -113,7 +113,7 @@ class _DevicesPageState extends State<DevicesPage> {
     final draggedDevice = allDevices.removeAt(oldIndex);
     allDevices.insert(newIndex, draggedDevice);
     String allDevicesJson = jsonEncode(allDevices);
-    widget.storage.writeCounter(allDevicesJson);
+    widget.storage.writeDevices(allDevicesJson);
 
     _devices = allDevicesJson;
 
@@ -134,10 +134,10 @@ class _DevicesPageState extends State<DevicesPage> {
     editedDevice["mac"] = result[2];
     allDevices.insert(resultIndex, editedDevice);
     String allDevicesJson = jsonEncode(allDevices);
-    widget.storage.writeCounter(allDevicesJson);
+    widget.storage.writeDevices(allDevicesJson);
     _devices = allDevicesJson;
 
-    widget.storage.readCounter().then((value) {
+    widget.storage.readDevices().then((value) {
       List<dynamic> devices = jsonDecode(value);
       setState(() {
         myComputers.clear();
@@ -149,7 +149,7 @@ class _DevicesPageState extends State<DevicesPage> {
   }
 
   Future<void> _refresh() async {
-    widget.storage.readCounter().then((value) {
+    widget.storage.readDevices().then((value) {
       setState(() {
         _devices = value;
         List<dynamic> allDevices = jsonDecode(_devices);

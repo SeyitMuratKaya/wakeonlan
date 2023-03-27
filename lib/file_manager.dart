@@ -10,16 +10,15 @@ class FileManager {
 
   Future<File> get _localFile async {
     final path = await _localPath;
-    return File('$path/test.json');
+    return File('$path/test1.json');
   }
 
-  Future<String> readCounter() async {
+  Future<String> readDevices() async {
     try {
       final file = await _localFile;
 
-      // Read the file
-
       String contents;
+
       try {
         contents = await file.readAsString();
       } catch (e) {
@@ -28,15 +27,14 @@ class FileManager {
 
       return contents;
     } catch (e) {
-      // If encountering an error, return 0
-      return "read error";
+      return "Read Error";
     }
   }
 
-  Future<File> writeCounter(String test) async {
+  Future<File> writeDevices(String devices) async {
     final file = await _localFile;
-    // Write the file
-    return file.writeAsString(test);
+
+    return file.writeAsString(devices);
   }
 }
 
