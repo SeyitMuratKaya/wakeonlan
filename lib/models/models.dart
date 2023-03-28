@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class Item {
   String id = UniqueKey().toString();
@@ -90,5 +93,50 @@ class AppTheme extends ChangeNotifier {
     _prefs?.setBool("autoThemeMode", _autoThemeModeSelected);
     _prefs?.setBool("darkMode", _darkModeSelected);
     _prefs?.setInt("selectedColor", _selectedColor);
+  }
+}
+
+class InternetStatus extends ChangeNotifier {
+  bool _status = false;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
+  bool get status => _status;
+
+  set status(bool value) {
+    _status = value;
+    notifyListeners();
+  }
+
+  InternetStatus() {
+    initConnectivity();
+
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+
+    try {
+      result = await _connectivity.checkConnectivity();
+    } catch (e) {
+      debugPrint(e.toString());
+      return;
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    if (result == ConnectivityResult.wifi) {
+      _status = true;
+    }
   }
 }

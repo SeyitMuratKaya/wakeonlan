@@ -12,6 +12,7 @@ import 'dart:io' show Platform;
 void main() => runApp(MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AppTheme()),
+        ChangeNotifierProvider(create: (_) => InternetStatus()),
       ],
       child: const Home(),
     ));
