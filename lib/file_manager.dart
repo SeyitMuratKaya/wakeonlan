@@ -36,6 +36,17 @@ class FileManager {
 
     return file.writeAsString(devices);
   }
+
+  Future<int> deleteFile() async {
+    try {
+      final file = await _localFile;
+
+      await file.delete();
+      return 1;
+    } catch (e) {
+      return 0;
+    }
+  }
 }
 
 class Device {
