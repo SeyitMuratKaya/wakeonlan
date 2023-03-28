@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lan_scanner/lan_scanner.dart';
+import 'package:network_info_plus/network_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:wakeonlan/file_manager.dart';
 import 'package:wakeonlan/models/models.dart';
@@ -65,8 +66,14 @@ class _BottomNavigationState extends State<BottomNavigation> {
   Future<void> scan() async {
     final scanner = LanScanner();
 
+    var wifiIP = await NetworkInfo().getWifiIP();
+
+    if(wifiIP == null) return;
+
+    var subnet = ipToCSubnet(wifiIP);
+
     final stream =
-        scanner.icmpScan('192.168.1', progressCallback: (progress) {});
+        scanner.icmpScan(subnet, progressCallback: (progress) {});
 
     stream.listen((HostModel device) {
       debugPrint("Found host: ${device.ip}");

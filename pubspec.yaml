@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   lan_scanner: ^3.5.0
+  network_info_plus: ^3.0.2
   path_provider: ^2.0.13
   provider: ^6.0.5
   shared_preferences: ^2.0.20
