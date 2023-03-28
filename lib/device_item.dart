@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wakeonlan/file_manager.dart';
 import './wol/wake_on_lan.dart';
 import 'models/models.dart';
@@ -36,6 +37,7 @@ class _DeviceItemState extends State<DeviceItem> {
   void showMessage(String message) {
     var snackBar = SnackBar(
       content: Text(message),
+      behavior: SnackBarBehavior.floating,
     );
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -69,13 +71,18 @@ class _DeviceItemState extends State<DeviceItem> {
 
   @override
   Widget build(BuildContext context) {
+    final internetStatus = Provider.of<InternetStatus>(context);
     return Card(
       child: ListTile(
         onTap: () {
           //Wake the device
           String macAdd = widget.item.macAdd;
           String ipAdd = widget.item.ipAdd;
-          sendMagicPacket(ipAdd, macAdd);
+          if (internetStatus.status) {
+            sendMagicPacket(ipAdd, macAdd);
+          } else {
+            showMessage("No Network Connection");
+          }
         },
         leading: Badge(
           backgroundColor: widget.item.status ? Colors.green : Colors.red,

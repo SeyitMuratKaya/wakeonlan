@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lan_scanner/lan_scanner.dart';
 import 'package:network_info_plus/network_info_plus.dart';
+import 'package:provider/provider.dart';
 import '../models/models.dart';
 import '../network_item.dart';
 
@@ -54,8 +55,18 @@ class _NetworkPageState extends State<NetworkPage> {
     });
   }
 
+  void showMessage(String message) {
+    var snackBar = SnackBar(
+      content: Text(message),
+      behavior: SnackBarBehavior.floating,
+    );
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final internetStatus = Provider.of<InternetStatus>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Network"),
@@ -71,7 +82,13 @@ class _NetworkPageState extends State<NetworkPage> {
             child: IconButton(
               icon: const Icon(Icons.refresh),
               tooltip: 'Refresh Devices',
-              onPressed: scan,
+              onPressed: () {
+                if (internetStatus.status) {
+                  scan();
+                } else {
+                  showMessage("No Network Connection");
+                }
+              },
             ),
           ),
         ],
@@ -85,7 +102,13 @@ class _NetworkPageState extends State<NetworkPage> {
                   height: MediaQuery.of(context).size.height /
                       (orientation == Orientation.portrait ? 8 : 4),
                   child: ElevatedButton(
-                    onPressed: scan,
+                    onPressed: () {
+                      if (internetStatus.status) {
+                        scan();
+                      } else {
+                        showMessage("No Internet Connection");
+                      }
+                    },
                     child: const Text(
                       "Scan",
                       textScaleFactor: 2,

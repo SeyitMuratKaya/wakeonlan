@@ -137,6 +137,8 @@ class InternetStatus extends ChangeNotifier {
   Future<void> _updateConnectionStatus(ConnectivityResult result) async {
     if (result == ConnectivityResult.wifi) {
       _status = true;
+    } else {
+      _status = false;
     }
   }
 }
