@@ -39,10 +39,10 @@ class Home extends StatelessWidget {
             ? ColorScheme.fromSeed(seedColor: appTheme.color)
             : lightDynamic?.harmonized();
 
-        defaultDarkColorScheme = appTheme.darkModeSelected
-            ? darkDynamic?.harmonized()
-            : ColorScheme.fromSeed(
-                seedColor: appTheme.color, brightness: Brightness.dark);
+        defaultDarkColorScheme = appTheme.customColorSelected
+            ? ColorScheme.fromSeed(
+                seedColor: appTheme.color, brightness: Brightness.dark)
+            : darkDynamic?.harmonized();
       }
 
       return MaterialApp(
