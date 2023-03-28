@@ -7,6 +7,7 @@ import 'package:wakeonlan/models/models.dart';
 import 'package:wakeonlan/pages/devices_page.dart';
 import 'package:wakeonlan/pages/network_page.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'dart:io' show Platform;
 
 void main() => runApp(MultiProvider(
       providers: [
@@ -21,15 +22,29 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appTheme = Provider.of<AppTheme>(context);
-
-    final defaultLightColorScheme = ColorScheme.fromSeed(
-        seedColor: appTheme.customColorSelected ? appTheme.color : Colors.blue);
-
-    final defaultDarkColorScheme = ColorScheme.fromSeed(
-        seedColor: appTheme.customColorSelected ? appTheme.color : Colors.blue,
-        brightness: Brightness.dark);
-
+    late ColorScheme? defaultDarkColorScheme;
+    late ColorScheme? defaultLightColorScheme;
     return DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
+      if (Platform.isIOS) {
+        defaultLightColorScheme = ColorScheme.fromSeed(
+            seedColor:
+                appTheme.customColorSelected ? appTheme.color : Colors.blue);
+
+        defaultDarkColorScheme = ColorScheme.fromSeed(
+            seedColor:
+                appTheme.customColorSelected ? appTheme.color : Colors.blue,
+            brightness: Brightness.dark);
+      } else {
+        defaultLightColorScheme = appTheme.customColorSelected
+            ? ColorScheme.fromSeed(seedColor: appTheme.color)
+            : lightDynamic?.harmonized();
+
+        defaultDarkColorScheme = appTheme.darkModeSelected
+            ? darkDynamic?.harmonized()
+            : ColorScheme.fromSeed(
+                seedColor: appTheme.color, brightness: Brightness.dark);
+      }
+
       return MaterialApp(
         title: 'WakeOnLan',
         theme: ThemeData(
@@ -68,12 +83,11 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
     var wifiIP = await NetworkInfo().getWifiIP();
 
-    if(wifiIP == null) return;
+    if (wifiIP == null) return;
 
     var subnet = ipToCSubnet(wifiIP);
 
-    final stream =
-        scanner.icmpScan(subnet, progressCallback: (progress) {});
+    final stream = scanner.icmpScan(subnet, progressCallback: (progress) {});
 
     stream.listen((HostModel device) {
       debugPrint("Found host: ${device.ip}");
