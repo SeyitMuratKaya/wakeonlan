@@ -2,9 +2,9 @@
     package="com.example.wakeonlan">
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="wakeonlan"
+        android:label="WakeOnLan"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
