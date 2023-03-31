@@ -20,30 +20,17 @@ class _DevicesPageState extends State<DevicesPage> {
   final nameController = TextEditingController();
   final ipController = TextEditingController();
   final macController = TextEditingController();
-  String _devices = "";
   final List<Item> myComputers = <Item>[];
+  String _devices = "";
   Timer? timer;
 
   @override
   void initState() {
     super.initState();
-    widget.storage.readDevices().then((value) {
-      setState(() {
-        _devices = value;
-        List<dynamic> allDevices = jsonDecode(_devices);
-        setState(() {
-          myComputers.clear();
-          for (var element in allDevices) {
-            myComputers
-                .add(Item(element["name"], element["ip"], element["mac"]));
-          }
-        });
-        debugPrint("All devices $_devices");
-      });
-      checkDeviceStatus();
-    });
+    _refresh();
+    _checkDeviceStatus();
     timer = Timer.periodic(
-        const Duration(seconds: 5), (Timer t) => checkDeviceStatus());
+        const Duration(seconds: 5), (Timer t) => _checkDeviceStatus());
   }
 
   @override
@@ -56,16 +43,6 @@ class _DevicesPageState extends State<DevicesPage> {
     timer?.cancel();
   }
 
-  void checkDeviceStatus() {
-    for (var element in myComputers) {
-      if (scannedDevices.contains(element.ipAdd)) {
-        setState(() {
-          element.status = true;
-        });
-      }
-    }
-  }
-
   void _addDevice(List<String> result, int index) {
     Device newDevice = Device(name: result[0], ip: result[1], mac: result[2]);
 
@@ -73,34 +50,21 @@ class _DevicesPageState extends State<DevicesPage> {
 
     allDevices.insert(index, newDevice);
 
-    String allDevicesJson = jsonEncode(allDevices);
+    _saveToLocal(allDevices);
 
-    widget.storage.writeDevices(allDevicesJson);
-
-    widget.storage.readDevices().then((value) {
-      List<dynamic> devices = jsonDecode(value);
-      setState(() {
-        myComputers.clear();
-        for (var element in devices) {
-          myComputers.add(Item(element["name"], element["ip"], element["mac"]));
-        }
-      });
-    });
-
-    _devices = allDevicesJson;
+    _refresh();
   }
 
   void _deleteDevices(int index) {
     setState(() {
       if (myComputers.isNotEmpty) myComputers.removeAt(index);
     });
-    widget.storage.readDevices().then((value) {
-      List<dynamic> devices = jsonDecode(value);
-      devices.removeAt(index);
-      String newList = jsonEncode(devices);
-      widget.storage.writeDevices(newList);
-      _devices = newList;
-    });
+
+    List<dynamic> allDevices = jsonDecode(_devices);
+
+    allDevices.removeAt(index);
+
+    _saveToLocal(allDevices);
   }
 
   void _reorderDevices(int oldIndex, int newIndex) {
@@ -112,10 +76,8 @@ class _DevicesPageState extends State<DevicesPage> {
 
     final draggedDevice = allDevices.removeAt(oldIndex);
     allDevices.insert(newIndex, draggedDevice);
-    String allDevicesJson = jsonEncode(allDevices);
-    widget.storage.writeDevices(allDevicesJson);
 
-    _devices = allDevicesJson;
+    _saveToLocal(allDevices);
 
     setState(() {
       final draggedItem = myComputers.removeAt(oldIndex);
@@ -128,41 +90,48 @@ class _DevicesPageState extends State<DevicesPage> {
         myComputers.indexWhere((element) => element.id == result[3]);
 
     List<dynamic> allDevices = jsonDecode(_devices);
+
     final editedDevice = allDevices.removeAt(resultIndex);
+
     editedDevice["name"] = result[0];
     editedDevice["ip"] = result[1];
     editedDevice["mac"] = result[2];
-    allDevices.insert(resultIndex, editedDevice);
-    String allDevicesJson = jsonEncode(allDevices);
-    widget.storage.writeDevices(allDevicesJson);
-    _devices = allDevicesJson;
 
-    widget.storage.readDevices().then((value) {
-      List<dynamic> devices = jsonDecode(value);
-      setState(() {
-        myComputers.clear();
-        for (var element in devices) {
-          myComputers.add(Item(element["name"], element["ip"], element["mac"]));
-        }
-      });
-    });
+    allDevices.insert(resultIndex, editedDevice);
+
+    _saveToLocal(allDevices);
+
+    _refresh();
   }
 
   Future<void> _refresh() async {
     widget.storage.readDevices().then((value) {
+      List<dynamic> allDevices = jsonDecode(value);
       setState(() {
         _devices = value;
-        List<dynamic> allDevices = jsonDecode(_devices);
-        setState(() {
-          myComputers.clear();
-          for (var element in allDevices) {
-            myComputers
-                .add(Item(element["name"], element["ip"], element["mac"]));
-          }
-        });
-        debugPrint("All devices $_devices");
+        myComputers.clear();
+        for (var element in allDevices) {
+          myComputers.add(Item(element["name"], element["ip"], element["mac"]));
+        }
       });
+      debugPrint("Refreshed $_devices");
     });
+  }
+
+  void _saveToLocal(List<dynamic> allDevices) {
+    String allDevicesJson = jsonEncode(allDevices);
+    widget.storage.writeDevices(allDevicesJson);
+    _devices = allDevicesJson;
+  }
+
+  void _checkDeviceStatus() {
+    for (var element in myComputers) {
+      if (scannedDevices.contains(element.ipAdd)) {
+        setState(() {
+          element.status = true;
+        });
+      }
+    }
   }
 
   void _showSnackbar(String message, int index, List<String> result) {
