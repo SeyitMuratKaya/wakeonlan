@@ -7,13 +7,13 @@ environment:
   sdk: ">=2.19.3 <3.0.0"
 
 dependencies:
-  connectivity_plus: ^4.0.2
+  connectivity_plus: ^3.0.3
   convert: ^3.1.1
   dynamic_color: ^1.6.2
   flutter:
     sdk: flutter
-  lan_scanner: ^4.0.0+1
-  network_info_plus: ^4.0.2
+  lan_scanner: ^3.5.0
+  network_info_plus: ^3.0.2
   path_provider: ^2.0.13
   provider: ^6.0.5
   shared_preferences: ^2.0.20
@@ -22,7 +22,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: "^0.12.0"
 
 flutter_icons:
   android: "launcher_icon"
