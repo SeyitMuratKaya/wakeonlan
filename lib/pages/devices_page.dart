@@ -177,11 +177,11 @@ class _DevicesPageState extends State<DevicesPage> {
               direction: DismissDirection.endToStart,
               background: Container(
                 color: Colors.red,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 16),
+                child: const Padding(
+                  padding: EdgeInsets.only(right: 16),
                   child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
-                      children: const [Icon(Icons.delete)]),
+                      children: [Icon(Icons.delete)]),
                 ),
               ),
               onDismissed: (DismissDirection direction) {

@@ -2,7 +2,7 @@
 
 Simple Magic Packet Sender
 
-## Screenshots
+## Flutter App Screenshots
 
 <table>
   <tr>
